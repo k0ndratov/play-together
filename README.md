@@ -13,3 +13,7 @@ Ruby: 3.4.1 (+YJIT +PRISM)
 ## Running in Dev Mode
 
 To start in Docker, run the following command:
+
+```bash
+./dev.sh
+```
