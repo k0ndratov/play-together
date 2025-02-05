@@ -17,3 +17,9 @@ To start in Docker, run the following command:
 ```bash
 ./dev.sh
 ```
+
+To install telegram webhook
+
+```bash
+curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" -d "url=<YOUR_NGROK_HTTPS_URL>/telegram_bot/webhook"
+```
