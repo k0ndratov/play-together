@@ -1,6 +1,6 @@
-# GameNight
+# PlayTogether
 
-GameNight is an application for conveniently gathering friends to play games together.
+PlayTogether is an application for conveniently gathering friends to play games together.
 
 ## Technologies
 
