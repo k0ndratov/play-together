@@ -1,24 +1,15 @@
-# README
+# GameNight
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+GameNight is an application for conveniently gathering friends to play games together.
 
-Things you may want to cover:
+## Technologies
 
-* Ruby version
+Rails: 8.0.1
 
-* System dependencies
+Rack: 3.1.9
 
-* Configuration
+Ruby: 3.4.1 (+YJIT +PRISM)
 
-* Database creation
+## Running in Dev Mode
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+To start in Docker, run the following command:
