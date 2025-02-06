@@ -1,6 +1,10 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "dotenv"
+require "webmock/minitest"
+
+Dotenv.load(".env.test")
 
 module ActiveSupport
   class TestCase
