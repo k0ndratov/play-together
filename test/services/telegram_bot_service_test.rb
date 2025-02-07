@@ -5,7 +5,7 @@ class TelegramBotServiceTest < ActiveSupport::TestCase
     @text = "Hello world"
   end
 
-  test "shoud send request message to telegram bot" do
+  test "should send request message to telegram bot" do
     stub_request(:post, @send_message_api)
       .to_return(status: 200)
 
@@ -16,12 +16,20 @@ class TelegramBotServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "shoud return nothing if the request to telegram api failed" do
+  test "should return nothing if the request to telegram api failed" do
     stub_request(:post, @send_message_api)
       .to_return(status: 500)
 
     assert_nothing_raised do
       TelegramBotService.send_message(@chat_id, @text)
     end
+  end
+
+  test "should return true if text start with /" do
+    assert TelegramBotService.command?("/command")
+  end
+
+  test "should return false if text dont start with /" do
+    assert_not TelegramBotService.command?("not command")
   end
 end
