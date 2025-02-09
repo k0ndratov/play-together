@@ -9,6 +9,10 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 module PlayTogetherNext
+  # Main application configuration class.
+  #
+  # This class is responsible for configuring the Rails application, including
+  # loading defaults, autoload paths, and other global settings.
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0

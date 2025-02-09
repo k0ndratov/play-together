@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Base class for background jobs.
+#
+# This class inherits from `ActiveJob::Base` and provides default behavior
+# for all jobs in the application.
 class ApplicationJob < ActiveJob::Base
   # Automatically retry jobs that encountered a deadlock
   # retry_on ActiveRecord::Deadlocked

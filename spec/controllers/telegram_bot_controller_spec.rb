@@ -1,55 +1,53 @@
 # frozen_string_literal: true
 
 RSpec.describe TelegramBotController, type: :controller do
-  def params_with_text(text)
-    { message: { text: text, chat: { id: chat_id } } }
-  end
-
   describe '#webhook' do
-    let(:chat_id) { '1234' }
+    let(:send_message_api) do
+      'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
+    end
+    let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
+    let(:params) do
+      { message: { chat: { id: '123' }, text: '/random_game_name' }, 'controller' => 'telegram_bot',
+        'action' => 'webhook' }
+    end
 
-    context 'when message is blank' do
+    context 'when posted webhook' do
       it 'returns 200 OK' do
-        post :webhook, params: { message: nil }
+        post :webhook
 
         expect(response).to have_http_status :ok
       end
     end
 
-    context 'when text is not a command' do
-      it 'returns 200 OK' do
-        post :webhook, params: params_with_text('not a command')
-
-        expect(response).to have_http_status :ok
-      end
-    end
-
-    context 'when command is unknown' do
+    context 'when the message is presented' do
       before do
-        allow(TelegramBotService).to receive(:send_message)
+        allow(TelegramBotService).to receive(:process_command)
       end
 
-      it 'send unknown command message' do
-        post :webhook, params: params_with_text('/unknown_command')
+      it 'the command handler was called' do
+        post(:webhook, params:)
 
-        expect(TelegramBotService).to have_received(:send_message).with(chat_id, 'Unknown command.')
+        expect(TelegramBotService).to have_received(:process_command).with(ActionController::Parameters.new(params))
         expect(response).to have_http_status :ok
       end
     end
 
-    context 'when command is /random_game_name' do
-      let(:game_name) { 'Satisfactory' }
+    context 'when the message is /random_game_name' do
+      let(:expected_body) { { chat_id: '123', text: 'Satisfactory' }.to_json }
 
       before do
-        allow(SteamSpyService).to receive(:random_game_name).and_return(game_name)
-        allow(TelegramBotService).to receive(:send_message)
+        stub_request(:post, send_message_api).to_return(status: 200)
+        stub_request(:get, top_games_api).to_return(
+          status: 200,
+          body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
       end
 
-      it 'send random game name message' do
-        post :webhook, params: params_with_text('/random_game_name')
+      it 'sends game name message to telegram bot' do
+        post(:webhook, params:)
 
-        expect(TelegramBotService).to have_received(:send_message).with(chat_id, game_name)
-        expect(response).to have_http_status :ok
+        expect(a_request(:post, send_message_api).with(body: expected_body)).to have_been_made.once
       end
     end
   end

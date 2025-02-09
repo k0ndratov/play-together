@@ -1,25 +1,27 @@
 # frozen_string_literal: true
 
+# Service for fetching popular games from SteamSpy.
+#
+# This service provides methods to retrieve a list of top games and select a random game name.
 class SteamSpyService
-  require 'net/http'
-  require 'json'
+  class << self
+    def random_game_name
+      games = top_games
 
-  BASE_API_URL = 'https://steamspy.com/api.php'
+      games.any? ? [true, games.sample['name']] : [false, 'SteamSpy failed to load popular games']
+    end
 
-  def self.random_game_name
-    games = top_games
+    def top_games
+      url = "#{ENV.fetch('STEAM_SPY_BASE_API')}?request=top100in2weeks"
 
-    games.to_a.sample[1]['name'] unless games.nil?
-  end
+      response = HTTParty.get(url)
 
-  def self.top_games
-    uri = URI("#{BASE_API_URL}?request=top100in2weeks")
-    begin
-      response = Net::HTTP.get(uri)
-      JSON.parse(response)
-    rescue StandardError => e
-      Rails.logger.error("Steamspy API request failed: #{e.message}")
-      nil
+      unless response.success?
+        NetworkErrorLogger.log response
+        return []
+      end
+
+      response.parsed_response.values
     end
   end
 end
