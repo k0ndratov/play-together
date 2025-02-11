@@ -7,8 +7,20 @@ RSpec.describe TelegramBotController, type: :controller do
     end
     let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
     let(:params) do
-      { message: { chat: { id: '123' }, text: '/random_game_name' }, 'controller' => 'telegram_bot',
-        'action' => 'webhook' }
+      {
+        action: 'webhook',
+        controller: 'telegram_bot',
+        message: {
+          chat: { id: '123' },
+          from: {
+            first_name: 'Андрей',
+            id: '1',
+            last_name: 'Кондратов',
+            username: 'k0ndratov'
+          },
+          text: '/random_game_name'
+        }
+      }
     end
 
     context 'when posted webhook' do
@@ -27,7 +39,10 @@ RSpec.describe TelegramBotController, type: :controller do
       it 'the command handler was called' do
         post(:webhook, params:)
 
-        expect(TelegramBotService).to have_received(:process_command).with(ActionController::Parameters.new(params))
+        # TODO: Как проверить, что все params были переданы?
+        # Ошибка сравнения hash с ActionController::Parameters
+        expected_params = ActionController::Parameters.new(params)
+        expect(TelegramBotService).to have_received(:process_command).with(expected_params)
         expect(response).to have_http_status :ok
       end
     end
