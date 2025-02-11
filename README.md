@@ -33,3 +33,8 @@ Will return a random popular game from Steam over the last 2 weeks
 ```
 /random_game_name
 ```
+
+Will return a ID and username of the user
+```
+/user_info
+```

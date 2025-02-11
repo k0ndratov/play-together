@@ -6,12 +6,29 @@ RSpec.describe TelegramBotService do
   end
   let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
 
-  let(:chat_id) { '1234' }
+  let(:chat_id) { 1 }
 
-  let(:params) { { message: { text: text, chat: { id: chat_id } } } }
+  let(:params) do
+    {
+      message: {
+        from: {
+          id: chat_id,
+          username: 'k0ndratov',
+          first_name: 'Андрей',
+          last_name: 'Кондратов'
+        },
+        chat: { id: chat_id },
+        text:
+      },
+      controller: 'telegram_bot',
+      action: 'webhook'
+    }
+  end
 
   describe '.process_command' do
-    subject(:process_command) { described_class.process_command(params) }
+    subject(:process_command) do
+      described_class.process_command(params)
+    end
 
     context 'when text is an unknown command' do
       let(:text) { '/unknown_command' }
@@ -31,28 +48,47 @@ RSpec.describe TelegramBotService do
     end
 
     context 'when text is a command' do
-      let(:text) { '/random_game_name' }
-      let!(:send_game_name_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: 'Satisfactory'
-          }.to_json)
-          .to_return(status: 200)
+      context 'with /random_game_name' do
+        let(:text) { '/random_game_name' }
+        let!(:send_game_name_stub) do
+          stub_request(:post, send_message_api)
+            .with(body: {
+              chat_id:,
+              text: 'Satisfactory'
+            }.to_json)
+            .to_return(status: 200)
+        end
+
+        before do
+          stub_request(:get, top_games_api)
+            .to_return(
+              status: 200,
+              body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
+              headers: { 'Content-Type' => 'application/json' }
+            )
+        end
+
+        it 'sends game name message' do
+          process_command
+          expect(send_game_name_stub).to have_been_requested.once
+        end
       end
 
-      before do
-        stub_request(:get, top_games_api)
-          .to_return(
-            status: 200,
-            body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
-            headers: { 'Content-Type' => 'application/json' }
-          )
-      end
+      context 'with /user_info' do
+        let(:text) { '/user_info' }
+        let!(:send_user_info_stub) do
+          stub_request(:post, send_message_api)
+            .with(body: {
+              chat_id:,
+              text: 'Ваш уникальный ID: 1. Ваш никнейм: k0ndratov.'
+            }.to_json)
+            .to_return(status: 200)
+        end
 
-      it 'sends game name message' do
-        process_command
-        expect(send_game_name_stub).to have_been_requested.once
+        it 'sends user info message' do
+          process_command
+          expect(send_user_info_stub).to have_been_requested.once
+        end
       end
     end
 
