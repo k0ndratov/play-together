@@ -4,27 +4,27 @@ RSpec.describe User, type: :model do
   describe '.from_telegram' do
     let(:user_data) do
       {
-        "id": 1,
-        "username": 'k0ndratov',
-        "first_name": 'Андрей',
-        "last_name": 'Кондратов'
+        id: 1,
+        username: 'k0ndratov',
+        first_name: 'Андрей',
+        last_name: 'Кондратов'
       }
     end
     let(:updated_user_data) do
       {
-        "id": 1,
-        "username": 'ruby0nRailsMaster',
-        "first_name": 'Andrei',
-        "last_name": 'Kondratov'
+        id: 1,
+        username: 'ruby0nRailsMaster',
+        first_name: 'Andrei',
+        last_name: 'Kondratov'
       }
     end
 
     context 'when user exists' do
-      let!(:existed_user) { described_class.from_telegram(user_data) }
+      let!(:existed_user) { FactoryBot.create(:user) }
 
       it 'updates user data' do
-        expect(described_class.count).to eq(1)
-        described_class.from_telegram(updated_user_data)
+        expect { described_class.from_telegram(updated_user_data) }
+          .not_to change(described_class, :count)
 
         existed_user.reload
 
@@ -33,21 +33,19 @@ RSpec.describe User, type: :model do
           first_name: 'Andrei',
           last_name: 'Kondratov'
         )
-        expect(described_class.count).to eq(1)
       end
     end
 
     context 'when user does not exist' do
       it 'creates a new user' do
-        expect(described_class.count).to eq(0)
-        described_class.from_telegram(user_data)
+        expect { described_class.from_telegram(user_data) }
+          .to change(described_class, :count).by(1)
 
         expect(described_class.find(1)).to have_attributes(
           username: 'k0ndratov',
           first_name: 'Андрей',
           last_name: 'Кондратов'
         )
-        expect(described_class.count).to eq(1)
       end
     end
   end

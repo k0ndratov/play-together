@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  include Discard::Model
+
   validates :telegram_id, presence: true, uniqueness: true
   validates :username, uniqueness: true
+
+  has_many :party_memberships, dependent: :destroy
+  has_many :parties, through: :party_memberships
 
   class << self
     def from_telegram(user_info)
