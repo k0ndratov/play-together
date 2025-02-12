@@ -33,7 +33,7 @@ RSpec.describe TelegramBotController, type: :controller do
 
     context 'when the message is presented' do
       before do
-        allow(TelegramBotService).to receive(:process_command)
+        allow(Telegram::BotService).to receive(:process_command)
       end
 
       it 'the command handler was called' do
@@ -42,7 +42,7 @@ RSpec.describe TelegramBotController, type: :controller do
         # TODO: Как проверить, что все params были переданы?
         # Ошибка сравнения hash с ActionController::Parameters
         expected_params = ActionController::Parameters.new(params)
-        expect(TelegramBotService).to have_received(:process_command).with(expected_params)
+        expect(Telegram::BotService).to have_received(:process_command).with(expected_params)
         expect(response).to have_http_status :ok
       end
     end

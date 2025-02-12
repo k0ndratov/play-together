@@ -31,3 +31,7 @@ module PlayTogetherNext
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
+
+Rails.application.reloader.to_prepare do
+  Dir[Rails.root.join('app/services/telegram/commands/*.rb')].each { |file| require_dependency file }
+end
