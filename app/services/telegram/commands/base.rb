@@ -6,8 +6,9 @@ module Telegram
     class Base
       attr_reader :chat_id, :params
 
-      def initialize(chat_id)
+      def initialize(chat_id, params = nil)
         @chat_id = chat_id
+        @params = params
       end
 
       def execute

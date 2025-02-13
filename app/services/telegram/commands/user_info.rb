@@ -6,7 +6,7 @@ module Telegram
     class UserInfo < Telegram::Commands::Base
       def execute
         user = ::User.find_by(telegram_id: chat_id)
-        return unless user
+        return send_message("Couldn't get user information") unless user
 
         text = "Ваш уникальный ID: #{user.id}."
         text += " Ваш никнейм: #{user.username}." if user.username.present?

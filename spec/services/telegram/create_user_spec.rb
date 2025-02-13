@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Telegram::CreateUser do
-  describe '#call' do
+  describe '.call' do
     let(:user_data) do
       {
-        id: 1,
+        id: 15,
         username: 'k0ndratov',
         first_name: 'Андрей',
         last_name: 'Кондратов'
@@ -12,7 +12,7 @@ RSpec.describe Telegram::CreateUser do
     end
     let(:updated_user_data) do
       {
-        id: 1,
+        id: 15,
         username: 'ruby0nRailsMaster',
         first_name: 'Andrei',
         last_name: 'Kondratov'
@@ -22,12 +22,10 @@ RSpec.describe Telegram::CreateUser do
     context 'when user exists' do
       let!(:existed_user) { FactoryBot.create(:user) }
 
-      it 'updates user data' do
+      it 'update exists user' do
         expect { described_class.call(updated_user_data) }
           .not_to change(User, :count)
-
         existed_user.reload
-
         expect(existed_user).to have_attributes(
           username: 'ruby0nRailsMaster',
           first_name: 'Andrei',

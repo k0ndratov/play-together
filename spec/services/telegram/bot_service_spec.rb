@@ -6,7 +6,7 @@ RSpec.describe Telegram::BotService do
   end
   let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
 
-  let(:chat_id) { 1 }
+  let(:chat_id) { 15 }
 
   let(:params) do
     {
