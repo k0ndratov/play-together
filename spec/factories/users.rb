@@ -5,6 +5,7 @@ FactoryBot.define do
     first_name { 'John' }
     last_name { 'Smith' }
     username { 'j0hnsmith' }
-    sequence(:telegram_id) { |n| n }
+    telegram_id { 1 }
+    sequence(:id) { |n| n }
   end
 end

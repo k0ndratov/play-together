@@ -36,7 +36,7 @@ module Telegram
       private
 
       def add_or_update_user(user_info)
-        User.from_telegram(user_info)
+        Telegram::CreateUser.call(user_info)
       end
 
       def telegram_bot_api_url(endpoint)

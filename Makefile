@@ -3,7 +3,7 @@
 all: check
 
 rubocop:
-	bundle exec rubocop
+	bundle exec rubocop -A
 
 rspec:
 	bundle exec rspec
