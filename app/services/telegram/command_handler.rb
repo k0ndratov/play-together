@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Telegram
-  # Factory for creating Telegram command handlers.
+  # Handles the execution of different Telegram bot commands
   class CommandHandler
     COMMANDS = {
       '/random_game_name' => Telegram::Commands::RandomGameName,
