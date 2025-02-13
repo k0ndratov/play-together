@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe TelegramBotService do
+RSpec.describe Telegram::BotService do
   let(:send_message_api) do
     'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
   end
   let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
 
-  let(:chat_id) { 1 }
+  let(:chat_id) { 15 }
 
   let(:params) do
     {

@@ -1,21 +1,12 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  include Discard::Model
+
   validates :telegram_id, presence: true, uniqueness: true
-  validates :username, uniqueness: true
 
-  class << self
-    def from_telegram(user_info)
-      user = find_or_initialize_by(telegram_id: user_info[:id])
-      user.update!(
-        username: user_info[:username],
-        first_name: user_info[:first_name],
-        last_name: user_info[:last_name]
-      )
-
-      user
-    end
-  end
+  has_many :party_memberships, dependent: :destroy
+  has_many :parties, through: :party_memberships
 end
 
 # == Schema Information
