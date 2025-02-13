@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe TelegramBotService do
+RSpec.describe Telegram::BotService do
   let(:send_message_api) do
     'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
   end
