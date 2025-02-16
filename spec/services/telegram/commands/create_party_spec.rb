@@ -3,6 +3,15 @@
 RSpec.describe Telegram::Commands::CreateParty do
   include_context 'with send message stub'
 
+  shared_examples 'sends message' do |expected_message|
+    let!(:send_message_stub_call) { send_message_stub(chat_id, expected_message) }
+
+    it "sends message: #{expected_message}" do
+      execute
+      expect(send_message_stub_call).to have_been_requested
+    end
+  end
+
   describe '#execute' do
     subject(:execute) { described_class.new(chat_id, params).execute }
 
@@ -11,47 +20,30 @@ RSpec.describe Telegram::Commands::CreateParty do
 
     context 'when party name is blank' do
       let(:params) { '' }
-      let!(:send_error_message) do
-        send_message_stub(chat_id, 'Please provide a name for the party')
-      end
 
-      it 'returns error message' do
-        execute
-
-        expect(send_error_message).to have_been_requested
-      end
+      it_behaves_like 'sends message', 'Please provide a name for the party'
     end
 
     context 'when user does not exist' do
-      let!(:send_error_message) do
-        send_message_stub(chat_id, "Couldn't create a party")
-      end
-
-      it 'returns error message' do
-        execute
-
-        expect(send_error_message).to have_been_requested
-      end
+      it_behaves_like 'sends message', "Couldn't create a party"
     end
 
     context 'when user exists' do
-      let(:params) { 'Big party!' }
       let(:chat_id) { FactoryBot.create(:user)[:telegram_id] }
-      let!(:send_success_message) do
-        send_message_stub(chat_id, 'Party created: Big party!, ID: 1')
+
+      expected_message = 'Party created: GoGo Play together, ID: 1'
+
+      before do
+        send_message_stub(chat_id, expected_message)
       end
 
-      it 'returns success message' do
-        execute
-
-        expect(send_success_message).to have_been_requested
-      end
+      it_behaves_like 'sends message', expected_message
 
       it "creates a user's party membership" do
         execute
 
         user = User.kept.find_by(telegram_id: chat_id)
-        party = Party.kept.find_by(name: 'Big party!')
+        party = Party.kept.find_by(name: params)
         party_membership = PartyMembership.kept.find_by(user: user, party: party)
 
         expect(user.parties).to include(party)
