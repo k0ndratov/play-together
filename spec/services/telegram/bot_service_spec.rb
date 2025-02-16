@@ -2,9 +2,9 @@
 
 RSpec.describe Telegram::BotService do
   include_context 'with send message stub'
+  include_context 'with top games stub'
 
   let(:chat_id) { 15 }
-  let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
 
   let(:params) do
     {
@@ -42,12 +42,7 @@ RSpec.describe Telegram::BotService do
         let!(:send_game_name_stub) { send_message_stub(chat_id, 'Satisfactory') }
 
         before do
-          stub_request(:get, top_games_api)
-            .to_return(
-              status: 200,
-              body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
-              headers: { 'Content-Type' => 'application/json' }
-            )
+          top_games_stub
         end
 
         it 'sends game name message' do

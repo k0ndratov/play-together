@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe TelegramBotController, type: :controller do
+  include_context 'with top games stub'
+
   describe '#webhook' do
     let(:send_message_api) do
       'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
     end
-    let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
     let(:params) do
       {
         action: 'webhook',
@@ -52,11 +53,7 @@ RSpec.describe TelegramBotController, type: :controller do
 
       before do
         stub_request(:post, send_message_api).to_return(status: 200)
-        stub_request(:get, top_games_api).to_return(
-          status: 200,
-          body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
+        top_games_stub
       end
 
       it 'sends game name message to telegram bot' do

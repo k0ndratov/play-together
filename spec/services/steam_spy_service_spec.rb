@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe SteamSpyService do
+  include_context 'with top games stub'
+
   describe '.random_game_name' do
     context 'when request to Steamspy API is successful' do
       let(:asserted_game_name) { 'Satisfactory' }
 
       before do
-        stub_request(:get, 'https://steamspy.com/api.php?request=top100in2weeks')
-          .to_return(
-            status: 200,
-            body: { '1234' => { 'name' => asserted_game_name } }.to_json,
-            headers: { 'Content-Type' => 'application/json' }
-          )
+        top_games_stub
       end
 
       it 'returns a tuple with random game name' do
@@ -24,11 +21,7 @@ RSpec.describe SteamSpyService do
 
     context 'when request to Steamspy API fails' do
       before do
-        stub_request(:get, 'https://steamspy.com/api.php?request=top100in2weeks')
-          .to_return(
-            status: 500,
-            body: 'Internal Server Error'
-          )
+        top_games_stub('Internal Server Error', 500)
       end
 
       it 'returns a tuple with error message' do
