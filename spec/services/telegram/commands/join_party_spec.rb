@@ -4,16 +4,13 @@ RSpec.describe Telegram::Commands::JoinParty do
   describe '#execute' do
     subject(:execute) { described_class.new(chat_id, params).execute }
 
+    include_context 'with send message stub'
+
     let(:chat_id) { FactoryBot.attributes_for(:user)[:telegram_id] }
-    let(:send_message_api) do
-      'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
-    end
 
     context 'when party id is invalid' do
       let!(:send_error_message_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: { chat_id: chat_id, text: 'Invalid ID' }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'Invalid ID')
       end
 
       [
@@ -36,9 +33,7 @@ RSpec.describe Telegram::Commands::JoinParty do
 
     context 'when the party does not exist' do
       let!(:send_error_message_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: { chat_id: chat_id, text: 'Could not find party with this id' }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'Could not find party with this id')
       end
       let(:params) { '10' }
 
@@ -50,9 +45,7 @@ RSpec.describe Telegram::Commands::JoinParty do
 
     context 'when the user does not exist' do
       let!(:send_error_message_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: { chat_id: chat_id, text: 'Failed to join the party' }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'Failed to join the party')
       end
       let(:party) { FactoryBot.create(:party) }
       let(:params) { party.id }
@@ -66,9 +59,7 @@ RSpec.describe Telegram::Commands::JoinParty do
     context 'when the user already in the party' do
       let(:chat_id) { user.telegram_id }
       let!(:send_error_message_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: { chat_id: chat_id, text: 'You are already in this party' }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'You are already in this party')
       end
       let(:user) { FactoryBot.create(:user, :with_parties) }
       let(:params) { user.parties.first.id }
@@ -82,9 +73,7 @@ RSpec.describe Telegram::Commands::JoinParty do
     context 'when the user successfully join the party' do
       let(:chat_id) { user.telegram_id }
       let!(:send_success_message_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: { chat_id: chat_id, text: "You have joined the party '#{party.name}'" }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, "You have joined the party '#{party.name}'")
       end
       let(:user) { FactoryBot.create(:user) }
       let(:party) { FactoryBot.create(:party) }

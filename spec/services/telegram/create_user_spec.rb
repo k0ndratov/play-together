@@ -23,7 +23,7 @@ RSpec.describe Telegram::CreateUser do
     context 'when user exists' do
       let!(:existed_user) { FactoryBot.create(:user, telegram_id:) }
 
-      it 'update exists user' do
+      it 'updates existing user' do
         expect { described_class.call(updated_user_data) }
           .not_to change(User, :count)
         existed_user.reload
@@ -40,7 +40,7 @@ RSpec.describe Telegram::CreateUser do
         expect { described_class.call(user_data) }
           .to change(User, :count).by(1)
 
-        expect(User.find(1)).to have_attributes(
+        expect(User.find_by(telegram_id: telegram_id)).to have_attributes(
           username: 'k0ndratov',
           first_name: 'Андрей',
           last_name: 'Кондратов'

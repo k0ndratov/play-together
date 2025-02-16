@@ -1,26 +1,16 @@
-# frozen_string_literal: true
-
 RSpec.describe Telegram::Commands::CreateParty do
+  include_context 'with send message stub'
+
   describe '#execute' do
-    subject(:execute) do
-      described_class.new(chat_id, params).execute
-    end
+    subject(:execute) { described_class.new(chat_id, params).execute }
 
     let(:params) { 'GoGo Play together' }
     let(:chat_id) { 1 }
-    let(:send_message_api) do
-      'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
-    end
 
-    context 'when party name is black' do
+    context 'when party name is blank' do
       let(:params) { '' }
       let!(:send_error_message) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: 'Please provide a name for the party'
-          }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'Please provide a name for the party')
       end
 
       it 'returns error message' do
@@ -30,14 +20,9 @@ RSpec.describe Telegram::Commands::CreateParty do
       end
     end
 
-    context 'when user does not exists' do
+    context 'when user does not exist' do
       let!(:send_error_message) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: "Couldn't create a party"
-          }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, "Couldn't create a party")
       end
 
       it 'returns error message' do
@@ -49,15 +34,10 @@ RSpec.describe Telegram::Commands::CreateParty do
 
     context 'when user exists' do
       let(:params) { 'Big party!' }
-      let!(:send_success_message) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: 'Party created: Big party!, ID: 1'
-          }.to_json)
-          .to_return(status: 200)
-      end
       let(:chat_id) { FactoryBot.create(:user)[:telegram_id] }
+      let!(:send_success_message) do
+        send_message_stub(chat_id, 'Party created: Big party!, ID: 1')
+      end
 
       it 'returns success message' do
         execute

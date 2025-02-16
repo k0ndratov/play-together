@@ -2,10 +2,10 @@
 
 RSpec.describe SteamSpyService do
   describe '.random_game_name' do
-    context 'when request to Steamspy API is successfull' do
+    context 'when request to Steamspy API is successful' do
       let(:asserted_game_name) { 'Satisfactory' }
 
-      def stub_successful_request
+      before do
         stub_request(:get, 'https://steamspy.com/api.php?request=top100in2weeks')
           .to_return(
             status: 200,
@@ -15,8 +15,6 @@ RSpec.describe SteamSpyService do
       end
 
       it 'returns a tuple with random game name' do
-        stub_successful_request
-
         success, name = described_class.random_game_name
 
         expect(success).to be true
@@ -24,8 +22,8 @@ RSpec.describe SteamSpyService do
       end
     end
 
-    context 'when request to Steamspy API is failured' do
-      def stub_failed_request
+    context 'when request to Steamspy API fails' do
+      before do
         stub_request(:get, 'https://steamspy.com/api.php?request=top100in2weeks')
           .to_return(
             status: 500,
@@ -34,8 +32,6 @@ RSpec.describe SteamSpyService do
       end
 
       it 'returns a tuple with error message' do
-        stub_failed_request
-
         success, reason = described_class.random_game_name
 
         expect(success).to be false

@@ -32,6 +32,15 @@ module PlayTogetherNext
   end
 end
 
+# In development mode, Rails does not automatically load these files,
+# even on the first server start, because they are not explicitly referenced anywhere.
+# However, Telegram commands must be registered dynamically
+# (see Telegram::Commands::Base.command and Telegram::CommandHandler.register).
+# If these classes are not loaded, the commands will not be registered,
+# causing them to be unavailable.
+#
+# This ensures that all command files are loaded every time the code is reloaded,
+# so they are always properly registered.
 Rails.application.reloader.to_prepare do
   Dir[Rails.root.join('app/services/telegram/commands/*.rb')].each { |file| require_dependency file }
 end

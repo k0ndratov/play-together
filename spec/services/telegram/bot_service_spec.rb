@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Telegram::BotService do
-  let(:send_message_api) do
-    'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
-  end
-  let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
+  include_context 'with send message stub'
 
   let(:chat_id) { 15 }
+  let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
 
   let(:params) do
     {
@@ -26,20 +24,11 @@ RSpec.describe Telegram::BotService do
   end
 
   describe '.process_command' do
-    subject(:process_command) do
-      described_class.process_command(params)
-    end
+    subject(:process_command) { described_class.process_command(params) }
 
     context 'when text is an unknown command' do
       let(:text) { '/unknown_command' }
-      let!(:send_unknown_command_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: 'Unknown command.'
-          }.to_json)
-          .to_return(status: 200)
-      end
+      let!(:send_unknown_command_stub) { send_message_stub(chat_id, 'Unknown command.') }
 
       it 'sends unknown command message' do
         process_command
@@ -50,14 +39,7 @@ RSpec.describe Telegram::BotService do
     context 'when text is a command' do
       context 'with /random_game_name' do
         let(:text) { '/random_game_name' }
-        let!(:send_game_name_stub) do
-          stub_request(:post, send_message_api)
-            .with(body: {
-              chat_id:,
-              text: 'Satisfactory'
-            }.to_json)
-            .to_return(status: 200)
-        end
+        let!(:send_game_name_stub) { send_message_stub(chat_id, 'Satisfactory') }
 
         before do
           stub_request(:get, top_games_api)
@@ -76,14 +58,7 @@ RSpec.describe Telegram::BotService do
 
       context 'with /user_info' do
         let(:text) { '/user_info' }
-        let!(:send_user_info_stub) do
-          stub_request(:post, send_message_api)
-            .with(body: {
-              chat_id:,
-              text: 'Ваш уникальный ID: 1. Ваш никнейм: k0ndratov.'
-            }.to_json)
-            .to_return(status: 200)
-        end
+        let!(:send_user_info_stub) { send_message_stub(chat_id, 'Ваш уникальный ID: 1. Ваш никнейм: k0ndratov.') }
 
         it 'sends user info message' do
           process_command
@@ -95,12 +70,7 @@ RSpec.describe Telegram::BotService do
     context 'when text is not a command' do
       let(:text) { 'Just a text' }
       let!(:send_suggestion_stub) do
-        stub_request(:post, send_message_api)
-          .with(body: {
-            chat_id:,
-            text: 'Did you just send the text? I suggest you try "/random_game_name".'
-          }.to_json)
-          .to_return(status: 200)
+        send_message_stub(chat_id, 'Did you just send the text? I suggest you try "/random_game_name".')
       end
 
       it 'sends suggestion message' do
