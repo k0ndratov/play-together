@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+module Telegram
+  module Commands
+    # Command for retrieving user info.
+    class UserInfo < Telegram::Commands::Base
+      command '/user_info'
+
+      def execute
+        user = ::User.kept.find_by(telegram_id: chat_id)
+        return send_message("Couldn't get user information") unless user
+
+        text = "Ваш уникальный ID: #{user.id}."
+        text += " Ваш никнейм: #{user.username}." if user.username.present?
+
+        send_message(text)
+      end
+    end
+  end
+end

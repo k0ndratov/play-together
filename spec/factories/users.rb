@@ -1,12 +1,27 @@
 # frozen_string_literal: true
 
-class User < ApplicationRecord
-  include Discard::Model
+FactoryBot.define do
+  factory :user do
+    first_name { Faker::Name.first_name }
+    last_name { Faker::Name.last_name }
+    username { Faker::Internet.username }
+    sequence(:telegram_id, 15) { |n| n }
 
-  validates :telegram_id, presence: true, uniqueness: true
+    transient do
+      parties_count { 3 }
+    end
 
-  has_many :party_memberships, dependent: :destroy
-  has_many :parties, through: :party_memberships
+    trait :with_parties do
+      after(:create) do |user, evaluator|
+        create_list(
+          :party_membership,
+          evaluator.parties_count,
+          user:,
+          party: create(:party)
+        )
+      end
+    end
+  end
 end
 
 # == Schema Information

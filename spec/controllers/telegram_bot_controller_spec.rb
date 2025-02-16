@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe TelegramBotController, type: :controller do
+  include_context 'with top games stub'
+
   describe '#webhook' do
     let(:send_message_api) do
       'https://api.telegram.org/botfake39:tokenDO9yV0OOIpYCFT82FBiz_l2-riZZqs/sendMessage'
     end
-    let(:top_games_api) { 'https://steamspy.com/api.php?request=top100in2weeks' }
     let(:params) do
       {
         action: 'webhook',
@@ -33,7 +34,7 @@ RSpec.describe TelegramBotController, type: :controller do
 
     context 'when the message is presented' do
       before do
-        allow(TelegramBotService).to receive(:process_command)
+        allow(Telegram::BotService).to receive(:process_command)
       end
 
       it 'the command handler was called' do
@@ -42,7 +43,7 @@ RSpec.describe TelegramBotController, type: :controller do
         # TODO: Как проверить, что все params были переданы?
         # Ошибка сравнения hash с ActionController::Parameters
         expected_params = ActionController::Parameters.new(params)
-        expect(TelegramBotService).to have_received(:process_command).with(expected_params)
+        expect(Telegram::BotService).to have_received(:process_command).with(expected_params)
         expect(response).to have_http_status :ok
       end
     end
@@ -52,11 +53,7 @@ RSpec.describe TelegramBotController, type: :controller do
 
       before do
         stub_request(:post, send_message_api).to_return(status: 200)
-        stub_request(:get, top_games_api).to_return(
-          status: 200,
-          body: { '1' => { 'name' => 'Satisfactory' } }.to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )
+        top_games_stub
       end
 
       it 'sends game name message to telegram bot' do

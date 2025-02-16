@@ -38,3 +38,18 @@ Will return a ID and username of the user
 ```
 /user_info
 ```
+
+Will return a list of parties
+```
+/all_parties
+```
+
+Create a party
+```
+/create_party [name]
+```
+
+Join the party
+```
+/join_party [id]
+```
